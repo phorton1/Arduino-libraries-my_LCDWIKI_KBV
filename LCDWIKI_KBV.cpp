@@ -147,6 +147,10 @@ LCDWIKI_KBV::LCDWIKI_KBV(uint16_t model,uint8_t cs, uint8_t cd, uint8_t wr, uint
  	 pinMode(A0, OUTPUT);
   	 pinMode( 5, OUTPUT);
  #endif
+
+	// added to Init_LCD() in my version:
+	setWriteDir();
+
 #endif	// !__MK66FX1M0__  prh
  
  	rotation = 0;
@@ -178,8 +182,9 @@ LCDWIKI_KBV::LCDWIKI_KBV(uint16_t model,uint8_t cs, uint8_t cd, uint8_t wr, uint
 			break;
 	}
 */
-    setWriteDir();
- 	width = WIDTH;
+    
+ 	
+	width = WIDTH;
 	height = HEIGHT;		
 }
 
@@ -263,6 +268,7 @@ LCDWIKI_KBV::LCDWIKI_KBV(int16_t wid,int16_t heg,uint8_t cs, uint8_t cd, uint8_t
 // Initialization lcd modules
 void LCDWIKI_KBV::Init_LCD(void)
 {
+	setWriteDir();	// prh added in my version, should be benign
 	reset();
 	if(lcd_model == 0xFFFF)
 	{
