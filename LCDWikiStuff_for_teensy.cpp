@@ -12,7 +12,7 @@
     // for the TFT data pins 0..7
 
 
-uint8_t use_pins[] = {13,14,34,35,36,37,38,39};
+uint8_t use_pins[] = {19,13,34,35,36,37,38,39};
     // arbitrary mapping from my teensyExpression project
 
 // method to allow you to set them at runtime
