@@ -18,7 +18,7 @@ uint8_t use_pins[] = {19,13,34,35,36,37,38,39};
 // method to allow you to set them at runtime
 // before any operations are performed
 
-void setCheapTFTDataPins(
+void setTFTDataPins(
         int p0,
         int p1,
         int p2,

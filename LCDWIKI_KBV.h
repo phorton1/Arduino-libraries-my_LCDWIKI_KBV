@@ -50,6 +50,10 @@
 //#define USE_ADAFRUIT_SHIELD_PIN 1
 
 
+extern void setTFTDataPins(int p0,int p1,int p2,int p3,int p4,int p5,int p6,int p7);
+	// prh addition
+
+
 typedef struct _lcd_info
 {
 	uint16_t lcd_id;
