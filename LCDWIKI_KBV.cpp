@@ -1351,7 +1351,7 @@ void LCDWIKI_KBV::start(uint16_t ID)
 
 
 
-// prh ADDITIONS
+// prh addition = added LCDWIKI_KBV::dim() method
 
 #define NUM_BUF_LINES   1
 	// must divide evenly into 320

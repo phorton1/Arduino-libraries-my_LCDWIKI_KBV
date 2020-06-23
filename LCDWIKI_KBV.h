@@ -65,11 +65,9 @@ class LCDWIKI_KBV:public LCDWIKI_GUI
 {
 	public:
 		
-		// prh additions
-		
-		void dim();		// set all pixels to half their value
+		void dim();	// prh addition = added LCDWIKI_KBV::dim() method
+			// set all pixels to half their value
 	
-		
 		
 	LCDWIKI_KBV(uint16_t model,uint8_t cs, uint8_t cd, uint8_t wr, uint8_t rd, uint8_t reset);
 	LCDWIKI_KBV(int16_t wid,int16_t heg,uint8_t cs, uint8_t cd, uint8_t wr, uint8_t rd, uint8_t reset);
