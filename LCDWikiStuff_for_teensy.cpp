@@ -57,6 +57,11 @@ void  setWriteDir()
         pinMode(use_pins[i],OUTPUT);
 }
 
+
+#define USE_FAST_DIGITAL  1
+    // makes it about 10-20% faster
+    
+
 void _write8(uint8_t v)
 {
     #if DEBUG_LCD_STUFF
@@ -64,7 +69,11 @@ void _write8(uint8_t v)
     #endif
     for (int i=0; i<8; i++)
     {
-        digitalWrite(use_pins[i],v & 1);
+        #if USE_FAST_DIGITAL
+            digitalWriteFast(use_pins[i],v & 1);
+        #else
+            digitalWrite(use_pins[i],v & 1);
+        #endif
         v >>= 1;
     }
 }        
@@ -74,7 +83,11 @@ uint8_t _read8()
     uint8_t v = 0;
     for (int i=0; i<8; i++)
     {
-        v &= digitalRead(use_pins[i]) << i;
+        #if USE_FAST_DIGITAL
+            v |= digitalReadFast(use_pins[i]) << i;
+        #else
+            v |= digitalRead(use_pins[i]) << i;
+        #endif
     }
     #if DEBUG_LCD_STUFF
         display(0,"read8()=0x%02x",v);
