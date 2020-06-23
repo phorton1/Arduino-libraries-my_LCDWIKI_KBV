@@ -552,9 +552,9 @@ uint16_t LCDWIKI_KBV::Read_Reg(uint16_t reg, int8_t index)
     delay(1); 
 	do 
 	{ 
-	//ead8(high);
-	//ead8(low);
-	//et = (high << 8) | lowc
+	//read8(high);
+	//read8(low);
+	//ret = (high << 8) | lowc
 		read16(ret);  //read 16bits
 	}while (--index >= 0);   
 //    RD_IDLE;
@@ -570,8 +570,11 @@ int16_t LCDWIKI_KBV::Read_GRAM(int16_t x, int16_t y, uint16_t *block, int16_t w,
 	// uint16_t ret, dummy;
     // int16_t n = w * h;
     // uint8_t r, g, b, tmp;
+	
 	uint16_t ret = 0;
-    int16_t n = w * h;
+    // int16_t n = w * h;
+    uint32_t n = w * h;		// prh
+
     uint8_t r, g, b;
     Set_Addr_Window(x, y, x + w - 1, y + h - 1);
     while (n > 0) 
@@ -621,6 +624,7 @@ int16_t LCDWIKI_KBV::Read_GRAM(int16_t x, int16_t y, uint16_t *block, int16_t w,
     }
 	return 0;
 }
+
 
 //read LCD controller chip ID 
 uint16_t LCDWIKI_KBV::Read_ID(void)
@@ -1340,4 +1344,61 @@ void LCDWIKI_KBV::start(uint16_t ID)
 	}
 	Set_Rotation(rotation); 
 	Invert_Display(false);
+}
+
+
+
+
+
+
+// prh ADDITIONS
+
+#define NUM_BUF_LINES   1
+	// must divide evenly into 320
+	// and I had to change an int16_t to a uint32_t in Read_DGRAM
+	// and it's too slow, and clunky with NUM_BUF_LINES>1
+	// and it doesn't restore colors correctly
+	// and it takes about 80% of the teensy memory at NUM_BUF_LINES=160
+	//
+	// So maybe dialogs that pop up over the rest of the program should be
+	// distinctly different, like black on white or black on yellow writing.
+	// ....
+
+uint16_t line_buf[480 * NUM_BUF_LINES];	
+	
+void LCDWIKI_KBV::dim()		// set all pixels to half their value
+{
+	static bool toggle = false;
+	
+	for (int y=0; y<320; y += NUM_BUF_LINES)
+	{
+		Read_GRAM(0,y,line_buf,480,NUM_BUF_LINES);
+	
+		Set_Addr_Window(0, y, 479, y+NUM_BUF_LINES-1);
+		CS_ACTIVE;
+		writeCmd8(CC);
+	
+		for (uint32_t i=0; i<480 * NUM_BUF_LINES; i++)
+		{
+			// color FROM 565
+			// the bits are as follows and get moved to the high order bits of the R G B bytes
+			//      15 14 13 12 11       10 9 8 7 6 5         4 3 2 1 0
+			//       7  6  5  4  3 210   7  6 5 4 3 2 10      7 6 5 4 3 210
+			
+			uint16_t color = line_buf[i];
+			int r = (color >> 8) & 0xF8;
+			int g = (color >> 3) & 0xFC;
+			int b = (color << 4) * 0xF8;
+			
+			uint16_t new_color = toggle ?
+				Color_To_565(r*4,g*4,b*4) :
+				Color_To_565(r/4,g/4,b/4);
+			
+			writeData16(new_color); 
+		}
+	}
+	
+	CS_IDLE;
+	toggle = !toggle;
+
 }

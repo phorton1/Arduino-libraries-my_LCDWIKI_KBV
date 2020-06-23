@@ -64,6 +64,13 @@ typedef struct _lcd_info
 class LCDWIKI_KBV:public LCDWIKI_GUI
 {
 	public:
+		
+		// prh additions
+		
+		void dim();		// set all pixels to half their value
+	
+		
+		
 	LCDWIKI_KBV(uint16_t model,uint8_t cs, uint8_t cd, uint8_t wr, uint8_t rd, uint8_t reset);
 	LCDWIKI_KBV(int16_t wid,int16_t heg,uint8_t cs, uint8_t cd, uint8_t wr, uint8_t rd, uint8_t reset);
 	void Init_LCD(void);
@@ -88,6 +95,33 @@ class LCDWIKI_KBV:public LCDWIKI_GUI
 	void Push_Any_Color(uint16_t * block, int16_t n, bool first, uint8_t flags);
 	void Push_Any_Color(uint8_t * block, int16_t n, bool first, uint8_t flags);
     void Vert_Scroll(int16_t top, int16_t scrollines, int16_t offset);
+		// ok, so not very useful to me, inasmuch as I am in a horizontal rotation,
+		// and the device is hardwired to think the "top" is the right edge, the
+		// parameters are:
+		//
+		//		top - the number of lines from the top (or right in my case) to NOT scroll
+		//      scroll_lines - the number of lines TO scroll
+		//      offset how much to scroll them by
+		//
+		// it is "wrapping" scroll, so what gets scrolled off the top shows up at the
+		// bottom (and what gets scrolled off the bottom shows up at the top).
+		// So, for me
+		//
+		//		mylcd.Vert_Scroll(100,280,20);
+		//
+		//      where the "top" is at the right, 100,280 specify the region 100 from
+		//      the right for 280, which corresponds to colums x=379 down to 100, and the "20"
+		//      moves them 20 (x columns) towards the right, so the right most 20 end up
+		//      showing starting at (my) x=100.
+		//
+		// It's doubly weird because apparently you are not moving the bytes in display
+		// memory, but re-organizing it, so subsequent writes of pixels take place in the
+		// offset window.  In other words, if you had scrolled the full window by 100, then
+		// write to 0,0 the pixel 100 (from the left in my case) lights up.
+		//
+		// Weird.  Useful for kiosk displays, I guess, but totally weird for a scrolling
+		// text display,
+	
 	int16_t Get_Height(void) const;
   	int16_t Get_Width(void) const;
 	void Set_LR(void);
