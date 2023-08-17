@@ -13,10 +13,19 @@
     extern uint8_t  _read8();
     extern void _write8(uint8_t v);
 
-    #define write8(v)   { _write8(v); WR_STROBE; }
-    #define read8(v)    { RD_ACTIVE; DELAY7; *(&v) = _read8(); RD_IDLE; }
+	#define PRH_DELAY_MIN delayMicroseconds(2)
+		// prh 2023-08-17 - I was getting blanks in lines in teensyExpression
+		// and determined empirically that I needed a delay between WR_ACTIVE
+		// and WR_IDLE, so took out the call to the WR_STROBE macro, put the
+		// WR_ACTIVE and WR_IDLE directly into the write() macro and messed
+		// with delay. 2 microseconds seems to be the minimum that worked.
 
-    #define DELAY7     delayMicroseconds(7);
+    #define write8(v)   { _write8(v); WR_ACTIVE; PRH_DELAY_MIN; WR_IDLE; }	// WR_STROBE; }
+    #define read8(v)    { RD_ACTIVE; DELAYN; *(&v) = _read8(); RD_IDLE; }
+
+    #define DELAYN     // delayMicroseconds(7);	// was DELAY7
+		// Just to be sure, I made a new define DELAYN and then
+		// determined this delay was not needed.
 
     #define RD_ACTIVE  digitalWrite(_rd, 0)    // *rdPort &=  rdPinUnset
     #define RD_IDLE    digitalWrite(_rd, 1)    // *rdPort |=  rdPinSet
